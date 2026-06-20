@@ -86,6 +86,11 @@ function renderAmendmentLog(entries) {
   document.getElementById("amendment-log-list").innerHTML = renderAmendmentLogHTML(entries);
 }
 
+function findChapterTitle(chapters, chapterId) {
+  const match = chapters.find((c) => c.id === chapterId);
+  return match ? match.title : null;
+}
+
 function handleAmendmentSubmit(event, content) {
   event.preventDefault();
 
@@ -108,7 +113,13 @@ function handleAmendmentSubmit(event, content) {
 
   errorsEl.textContent = "";
 
-  const chapterTitle = content.chapters.find((c) => c.id === chapter).title;
+  const chapterTitle = findChapterTitle(content.chapters, chapter);
+  if (!chapterTitle) {
+    errorsEl.textContent = "Please select a valid chapter.";
+    fallbackEl.hidden = true;
+    return;
+  }
+
   const { mailtoHref, body } = buildAmendmentMailto({
     chapter: chapterTitle,
     ruleText,
@@ -156,6 +167,8 @@ if (typeof module !== "undefined" && module.exports) {
     buildAmendmentMailto,
     renderAmendmentLogHTML,
     renderContent,
-    escapeHTML
+    escapeHTML,
+    findChapterTitle,
+    handleAmendmentSubmit
   };
 }

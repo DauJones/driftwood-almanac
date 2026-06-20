@@ -4,7 +4,8 @@ const {
   formatAmendmentText,
   buildAmendmentMailto,
   renderAmendmentLogHTML,
-  escapeHTML
+  escapeHTML,
+  findChapterTitle
 } = require("./script.js");
 
 // validateAmendmentForm
@@ -83,6 +84,17 @@ const {
     { chapter: "golf", text: "Missing some fields" }
   ]);
   assert.ok(!html.includes("undefined"));
+}
+
+// findChapterTitle
+{
+  const { findChapterTitle } = require("./script.js");
+  const chapters = [
+    { id: "golf", title: "Golf", rules: [] },
+    { id: "business-life", title: "Business & Life", rules: [] }
+  ];
+  assert.strictEqual(findChapterTitle(chapters, "golf"), "Golf");
+  assert.strictEqual(findChapterTitle(chapters, "nonexistent-id"), null);
 }
 
 console.log("All tests passed.");
