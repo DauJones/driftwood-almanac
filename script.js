@@ -168,7 +168,6 @@ if (typeof module !== "undefined" && module.exports) {
     renderAmendmentLogHTML,
     renderContent,
     escapeHTML,
-    findChapterTitle,
-    handleAmendmentSubmit
+    findChapterTitle
   };
 }
