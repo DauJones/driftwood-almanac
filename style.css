@@ -68,6 +68,33 @@ body {
   color: #1a1a1a;
 }
 
+.rule.rule-group {
+  display: block;
+}
+
+.rule-group-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1.1rem;
+}
+
+.rule-group-title {
+  font-weight: 700;
+}
+
+.subrule {
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  margin-left: 3.35rem;
+  padding: 0.45rem 0 0 0;
+}
+
+.subrule-number {
+  font-size: 1rem;
+  min-width: 1.75rem;
+}
+
 #amendment-form-section, #amendment-log-section {
   margin-top: 2.5rem;
   padding-top: 1.5rem;

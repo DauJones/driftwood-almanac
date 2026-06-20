@@ -9,19 +9,13 @@ function validateAmendmentForm({ target, ruleText }) {
   return { valid: errors.length === 0, errors };
 }
 
-function formatAmendmentText({ targetLabel, ruleText, proposedBy }) {
-  return [
-    "Proposed Amendment",
-    "",
-    `Target: ${targetLabel}`,
-    `Rule: ${ruleText}`,
-    `Proposed by: ${proposedBy}`
-  ].join("\n");
+function formatAmendmentText({ targetLabel, ruleText }) {
+  return ["Proposed Amendment", "", `Target: ${targetLabel}`, `Rule: ${ruleText}`].join("\n");
 }
 
-function buildAmendmentMailto({ targetLabel, ruleText, proposedBy, toEmail }) {
+function buildAmendmentMailto({ targetLabel, ruleText, toEmail }) {
   const subject = `Proposed Amendment: ${targetLabel}`;
-  const body = formatAmendmentText({ targetLabel, ruleText, proposedBy });
+  const body = formatAmendmentText({ targetLabel, ruleText });
   const mailtoHref = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   return { subject, body, mailtoHref };
 }
@@ -35,11 +29,39 @@ function escapeHTML(str) {
     .replace(/'/g, "&#39;");
 }
 
+function flattenRules(sections) {
+  const flat = [];
+  sections.forEach((s) => {
+    if (s.subrules) {
+      s.subrules.forEach((sub) => flat.push(sub));
+    } else {
+      flat.push(s);
+    }
+  });
+  return flat;
+}
+
+function buildRuleIndex(sections) {
+  const index = [];
+  let topNumber = 0;
+  sections.forEach((s) => {
+    topNumber += 1;
+    if (s.subrules) {
+      s.subrules.forEach((sub, j) => {
+        index.push({ id: sub.id, label: `${topNumber}.${j + 1}`, text: sub.text });
+      });
+    } else {
+      index.push({ id: s.id, label: `${topNumber}`, text: s.text });
+    }
+  });
+  return index;
+}
+
 function describeTarget(target, sections) {
   if (!target || target === "new") {
     return "New Rule";
   }
-  const match = sections.find((s) => s.id === target);
+  const match = flattenRules(sections).find((r) => r.id === target);
   return match ? `Amendment to "${match.text}"` : "Unknown Rule";
 }
 
@@ -64,22 +86,45 @@ function renderContent(content) {
   document.getElementById("cover-preamble").textContent = content.preamble;
 
   const rulesEl = document.getElementById("rules");
+  let topNumber = 0;
   rulesEl.innerHTML = content.sections
-    .map(
-      (s, i) => `
-      <section class="rule" id="${s.id}">
-        <span class="rule-number">${i + 1}</span>
-        <p class="rule-text">${escapeHTML(s.text)}</p>
-      </section>
-    `
-    )
+    .map((s) => {
+      topNumber += 1;
+      if (s.subrules) {
+        const subItems = s.subrules
+          .map(
+            (sub, j) => `
+            <div class="subrule">
+              <span class="rule-number subrule-number">${topNumber}.${j + 1}</span>
+              <p class="rule-text">${escapeHTML(sub.text)}</p>
+            </div>
+          `
+          )
+          .join("");
+        return `
+          <section class="rule rule-group" id="${s.id}">
+            <div class="rule-group-header">
+              <span class="rule-number">${topNumber}</span>
+              <p class="rule-text rule-group-title">${escapeHTML(s.title)}</p>
+            </div>
+            ${subItems}
+          </section>
+        `;
+      }
+      return `
+        <section class="rule" id="${s.id}">
+          <span class="rule-number">${topNumber}</span>
+          <p class="rule-text">${escapeHTML(s.text)}</p>
+        </section>
+      `;
+    })
     .join("");
 }
 
 function populateAmendmentTargetSelect(sections) {
   const select = document.getElementById("amendment-target");
-  const ruleOptions = sections
-    .map((s, i) => `<option value="${s.id}">Rule ${i + 1}</option>`)
+  const ruleOptions = buildRuleIndex(sections)
+    .map((r) => `<option value="${r.id}">Rule ${r.label}</option>`)
     .join("");
   select.innerHTML = `<option value="new">A new rule</option>${ruleOptions}`;
 }
@@ -116,7 +161,6 @@ function handleAmendmentSubmit(event, content) {
   const { mailtoHref, body } = buildAmendmentMailto({
     targetLabel,
     ruleText,
-    proposedBy: "Jimmy",
     toEmail: content.recipientEmail
   });
 
@@ -170,6 +214,7 @@ if (typeof module !== "undefined" && module.exports) {
     renderAmendmentLogHTML,
     renderContent,
     escapeHTML,
-    describeTarget
+    describeTarget,
+    buildRuleIndex
   };
 }
