@@ -1,5 +1,5 @@
 const CONTENT = {
-  title: "THE OFFICIAL RULES OF JIMMY [LASTNAME]",
+  title: "Jimmy's Rules",
   subtitle: "Est. 2026, Amended Constantly",
   preamble: "[ONE-LINE PERSONAL PREAMBLE FROM BEAR GOES HERE]",
   chapters: [
@@ -7,18 +7,9 @@ const CONTENT = {
       id: "golf",
       title: "Golf",
       rules: [
-        "[PLACEHOLDER GOLF RULE 1]",
-        "[PLACEHOLDER GOLF RULE 2]",
-        "[PLACEHOLDER GOLF RULE 3]"
-      ]
-    },
-    {
-      id: "business-life",
-      title: "Business & Life",
-      rules: [
-        "[PLACEHOLDER BUSINESS/LIFE RULE 1]",
-        "[PLACEHOLDER BUSINESS/LIFE RULE 2]",
-        "[PLACEHOLDER BUSINESS/LIFE RULE 3]"
+        "[PLACEHOLDER GOLF RULE 1 — MAKES THE GAME MORE FUN]",
+        "[PLACEHOLDER GOLF RULE 2 — MAKES THE GAME MORE FUN]",
+        "[PLACEHOLDER GOLF RULE 3 — MAKES THE GAME MORE FUN]"
       ]
     },
     {
