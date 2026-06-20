@@ -38,11 +38,43 @@ function renderAmendmentLogHTML(entries) {
     .join("\n");
 }
 
+function renderContent(content) {
+  document.getElementById("cover-title").textContent = content.title;
+  document.getElementById("cover-subtitle").textContent = content.subtitle;
+  document.getElementById("cover-preamble").textContent = content.preamble;
+
+  const toc = document.getElementById("toc");
+  toc.innerHTML = content.chapters
+    .map((c) => `<a href="#chapter-${c.id}">${c.title}</a>`)
+    .join("");
+
+  const chaptersEl = document.getElementById("chapters");
+  chaptersEl.innerHTML = content.chapters
+    .map(
+      (c) => `
+      <section class="chapter${c.id === "closing" ? " stamp" : ""}" id="chapter-${c.id}">
+        <h2>${c.title}</h2>
+        <ol>
+          ${c.rules.map((r) => `<li>${r}</li>`).join("")}
+        </ol>
+      </section>
+    `
+    )
+    .join("");
+}
+
+if (typeof document !== "undefined") {
+  document.addEventListener("DOMContentLoaded", () => {
+    renderContent(CONTENT);
+  });
+}
+
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     validateAmendmentForm,
     formatAmendmentText,
     buildAmendmentMailto,
-    renderAmendmentLogHTML
+    renderAmendmentLogHTML,
+    renderContent
   };
 }
