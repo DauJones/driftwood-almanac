@@ -41,7 +41,12 @@ body {
   color: #2a2a2a;
 }
 
+#rules {
+  counter-reset: rule;
+}
+
 .rule {
+  counter-increment: rule;
   display: flex;
   align-items: baseline;
   gap: 1.1rem;
@@ -51,6 +56,20 @@ body {
 
 .rule:last-child {
   border-bottom: none;
+}
+
+.rule-group {
+  counter-reset: subrule;
+}
+
+/* Numbers are CSS-generated from DOM order, not hand-typed in the markup —
+   reordering/adding/removing a rule in index.html renumbers automatically. */
+.rule-number::before {
+  content: counter(rule);
+}
+
+.subrule-number::before {
+  content: counter(rule) "." counter(subrule);
 }
 
 .rule-number {
@@ -83,6 +102,7 @@ body {
 }
 
 .subrule {
+  counter-increment: subrule;
   display: flex;
   align-items: baseline;
   gap: 0.85rem;

@@ -1,3 +1,5 @@
+const RECIPIENT_EMAIL = "donovansarahn@gmail.com";
+
 function validateAmendmentForm({ target, ruleText }) {
   const errors = [];
   if (!target || typeof target !== "string" || target.trim() === "") {
@@ -80,45 +82,22 @@ function renderAmendmentLogHTML(entries, sections) {
     .join("\n");
 }
 
-function renderContent(content) {
-  document.getElementById("cover-title").textContent = content.title;
-  document.getElementById("cover-subtitle").textContent = content.subtitle;
-  document.getElementById("cover-preamble").textContent = content.preamble;
-
+// The rules are static markup in index.html (see #rules) — this reads that
+// markup back into the same { id, text } / { id, title, subrules } shape the
+// pure functions above expect, so there's one source of truth for rule text.
+function getSectionsFromDOM() {
   const rulesEl = document.getElementById("rules");
-  let topNumber = 0;
-  rulesEl.innerHTML = content.sections
-    .map((s) => {
-      topNumber += 1;
-      if (s.subrules) {
-        const subItems = s.subrules
-          .map(
-            (sub, j) => `
-            <div class="subrule">
-              <span class="rule-number subrule-number">${topNumber}.${j + 1}</span>
-              <p class="rule-text">${escapeHTML(sub.text)}</p>
-            </div>
-          `
-          )
-          .join("");
-        return `
-          <section class="rule rule-group" id="${s.id}">
-            <div class="rule-group-header">
-              <span class="rule-number">${topNumber}</span>
-              <p class="rule-text rule-group-title">${escapeHTML(s.title)}</p>
-            </div>
-            ${subItems}
-          </section>
-        `;
-      }
-      return `
-        <section class="rule" id="${s.id}">
-          <span class="rule-number">${topNumber}</span>
-          <p class="rule-text">${escapeHTML(s.text)}</p>
-        </section>
-      `;
-    })
-    .join("");
+  return Array.from(rulesEl.children).map((el) => {
+    const groupTitleEl = el.querySelector(".rule-group-title");
+    if (groupTitleEl) {
+      const subrules = Array.from(el.querySelectorAll(".subrule")).map((sub) => ({
+        id: sub.id,
+        text: sub.querySelector(".rule-text").textContent
+      }));
+      return { id: el.id, title: groupTitleEl.textContent, subrules };
+    }
+    return { id: el.id, text: el.querySelector(".rule-text").textContent };
+  });
 }
 
 function populateAmendmentTargetSelect(sections) {
@@ -135,7 +114,7 @@ function renderAmendmentLog(entries, sections) {
   document.getElementById("amendment-log-list").innerHTML = renderAmendmentLogHTML(entries, sections);
 }
 
-function handleAmendmentSubmit(event, content) {
+function handleAmendmentSubmit(event, sections) {
   event.preventDefault();
 
   const targetSelect = document.getElementById("amendment-target");
@@ -157,11 +136,11 @@ function handleAmendmentSubmit(event, content) {
 
   errorsEl.textContent = "";
 
-  const targetLabel = describeTarget(target, content.sections);
+  const targetLabel = describeTarget(target, sections);
   const { mailtoHref, body } = buildAmendmentMailto({
     targetLabel,
     ruleText,
-    toEmail: content.recipientEmail
+    toEmail: RECIPIENT_EMAIL
   });
 
   // Always show both paths together — mailto success can't be reliably
@@ -176,7 +155,7 @@ function handleAmendmentSubmit(event, content) {
     proposedBy: "Jimmy",
     date: new Date().toISOString().slice(0, 10)
   });
-  renderAmendmentLog(amendmentLogEntries, content.sections);
+  renderAmendmentLog(amendmentLogEntries, sections);
 }
 
 function wireCopyButton() {
@@ -195,14 +174,13 @@ function wireCopyButton() {
 
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", () => {
-    renderContent(CONTENT);
-    populateAmendmentTargetSelect(CONTENT.sections);
-    amendmentLogEntries = [...CONTENT.amendmentLog];
-    renderAmendmentLog(amendmentLogEntries, CONTENT.sections);
+    const sections = getSectionsFromDOM();
+    populateAmendmentTargetSelect(sections);
+    renderAmendmentLog(amendmentLogEntries, sections);
     wireCopyButton();
     document
       .getElementById("amendment-form")
-      .addEventListener("submit", (event) => handleAmendmentSubmit(event, CONTENT));
+      .addEventListener("submit", (event) => handleAmendmentSubmit(event, sections));
   });
 }
 
@@ -212,7 +190,6 @@ if (typeof module !== "undefined" && module.exports) {
     formatAmendmentText,
     buildAmendmentMailto,
     renderAmendmentLogHTML,
-    renderContent,
     escapeHTML,
     describeTarget,
     buildRuleIndex
