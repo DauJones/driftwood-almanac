@@ -4,22 +4,8 @@ const {
   formatAmendmentText,
   buildAmendmentMailto,
   renderAmendmentLogHTML,
-  escapeHTML,
-  describeTarget,
-  buildRuleIndex
+  escapeHTML
 } = require("./script.js");
-
-const sections = [
-  {
-    id: "forgiveness",
-    title: "Forgiveness",
-    subrules: [
-      { id: "forgiveness-1", text: "Breakfast ball on the first tee." },
-      { id: "forgiveness-2", text: "If you hit a bad shot, you get to hit it again." }
-    ]
-  },
-  { id: "rule-3", text: "Foot wedges are legal." }
-];
 
 // validateAmendmentForm
 {
@@ -40,19 +26,19 @@ const sections = [
 
 // formatAmendmentText
 {
-  const text = formatAmendmentText({ targetLabel: "Rule 3", ruleText: "No gimmes." });
-  assert.ok(text.includes("Target: Rule 3"));
+  const text = formatAmendmentText({ targetLabel: "Rule 2", ruleText: "No gimmes." });
+  assert.ok(text.includes("Target: Rule 2"));
   assert.ok(text.includes("Rule: No gimmes."));
 }
 
 // buildAmendmentMailto
 {
   const { subject, body, mailtoHref } = buildAmendmentMailto({
-    targetLabel: "Rule 3",
+    targetLabel: "Rule 2",
     ruleText: "No gimmes.",
     toEmail: "donovansarahn@gmail.com"
   });
-  assert.strictEqual(subject, "Proposed Amendment: Rule 3");
+  assert.strictEqual(subject, "Proposed Amendment: Rule 2");
   assert.ok(body.includes("No gimmes."));
   assert.ok(mailtoHref.startsWith("mailto:donovansarahn@gmail.com?"));
   assert.ok(mailtoHref.includes(encodeURIComponent(subject)));
@@ -65,49 +51,29 @@ const sections = [
   assert.strictEqual(escapeHTML('He said "go"'), "He said &quot;go&quot;");
 }
 
-// buildRuleIndex
-{
-  const index = buildRuleIndex(sections);
-  assert.deepStrictEqual(index.map((r) => r.label), ["1.1", "1.2", "2"]);
-  assert.deepStrictEqual(index.map((r) => r.id), ["forgiveness-1", "forgiveness-2", "rule-3"]);
-}
-
-// describeTarget
-{
-  assert.strictEqual(describeTarget("new", sections), "New Rule");
-  assert.strictEqual(describeTarget("rule-3", sections), 'Amendment to "Foot wedges are legal."');
-  assert.strictEqual(
-    describeTarget("forgiveness-1", sections),
-    'Amendment to "Breakfast ball on the first tee."'
-  );
-  assert.strictEqual(describeTarget("nonexistent", sections), "Unknown Rule");
-}
-
 // renderAmendmentLogHTML
 {
-  const html = renderAmendmentLogHTML(
-    [{ target: "new", proposedText: "Test rule", proposedBy: "Bear", date: "2026-06-19" }],
-    sections
-  );
+  const html = renderAmendmentLogHTML([
+    { targetLabel: "A new rule", proposedText: "Test rule", proposedBy: "Bear", date: "2026-06-19" }
+  ]);
   assert.ok(html.includes("Test rule"));
   assert.ok(html.includes("Bear"));
-  assert.ok(html.includes("New Rule"));
+  assert.ok(html.includes("A new rule"));
 }
 {
-  const html = renderAmendmentLogHTML([], sections);
+  const html = renderAmendmentLogHTML([]);
   assert.ok(html.includes("reviewed by committee"));
 }
 {
-  const html = renderAmendmentLogHTML(
-    [{ target: "rule-3", proposedText: "No <gimmes> & no exceptions", proposedBy: "Bear", date: "2026-06-19" }],
-    sections
-  );
+  const html = renderAmendmentLogHTML([
+    { targetLabel: "Rule 2", proposedText: "No <gimmes> & no exceptions", proposedBy: "Bear", date: "2026-06-19" }
+  ]);
   assert.ok(html.includes("&lt;gimmes&gt;"));
   assert.ok(html.includes("&amp; no exceptions"));
   assert.ok(!html.includes("<gimmes>"));
 }
 {
-  const html = renderAmendmentLogHTML([{ target: "rule-3" }], sections);
+  const html = renderAmendmentLogHTML([{ targetLabel: "Rule 2" }]);
   assert.ok(!html.includes("undefined"));
 }
 

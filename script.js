@@ -31,49 +31,13 @@ function escapeHTML(str) {
     .replace(/'/g, "&#39;");
 }
 
-function flattenRules(sections) {
-  const flat = [];
-  sections.forEach((s) => {
-    if (s.subrules) {
-      s.subrules.forEach((sub) => flat.push(sub));
-    } else {
-      flat.push(s);
-    }
-  });
-  return flat;
-}
-
-function buildRuleIndex(sections) {
-  const index = [];
-  let topNumber = 0;
-  sections.forEach((s) => {
-    topNumber += 1;
-    if (s.subrules) {
-      s.subrules.forEach((sub, j) => {
-        index.push({ id: sub.id, label: `${topNumber}.${j + 1}`, text: sub.text });
-      });
-    } else {
-      index.push({ id: s.id, label: `${topNumber}`, text: s.text });
-    }
-  });
-  return index;
-}
-
-function describeTarget(target, sections) {
-  if (!target || target === "new") {
-    return "New Rule";
-  }
-  const match = flattenRules(sections).find((r) => r.id === target);
-  return match ? `Amendment to "${match.text}"` : "Unknown Rule";
-}
-
-function renderAmendmentLogHTML(entries, sections) {
+function renderAmendmentLogHTML(entries) {
   if (!entries || entries.length === 0) {
     return "<li>Amendment requests shown here and reviewed by committee.</li>";
   }
   return entries
     .map((e) => {
-      const targetLabel = escapeHTML(describeTarget(e.target, sections));
+      const targetLabel = escapeHTML(e.targetLabel || "Unknown");
       const text = escapeHTML(e.proposedText || "(no rule text)");
       const proposedBy = escapeHTML(e.proposedBy || "(unknown)");
       const date = escapeHTML(e.date || "(no date)");
@@ -82,39 +46,13 @@ function renderAmendmentLogHTML(entries, sections) {
     .join("\n");
 }
 
-// The rules are static markup in index.html (see #rules) — this reads that
-// markup back into the same { id, text } / { id, title, subrules } shape the
-// pure functions above expect, so there's one source of truth for rule text.
-function getSectionsFromDOM() {
-  const rulesEl = document.getElementById("rules");
-  return Array.from(rulesEl.children).map((el) => {
-    const groupTitleEl = el.querySelector(".rule-group-title");
-    if (groupTitleEl) {
-      const subrules = Array.from(el.querySelectorAll(".subrule")).map((sub) => ({
-        id: sub.id,
-        text: sub.querySelector(".rule-text").textContent
-      }));
-      return { id: el.id, title: groupTitleEl.textContent, subrules };
-    }
-    return { id: el.id, text: el.querySelector(".rule-text").textContent };
-  });
-}
-
-function populateAmendmentTargetSelect(sections) {
-  const select = document.getElementById("amendment-target");
-  const ruleOptions = buildRuleIndex(sections)
-    .map((r) => `<option value="${r.id}">Rule ${r.label}</option>`)
-    .join("");
-  select.innerHTML = `<option value="new">A new rule</option>${ruleOptions}`;
-}
-
 let amendmentLogEntries = [];
 
-function renderAmendmentLog(entries, sections) {
-  document.getElementById("amendment-log-list").innerHTML = renderAmendmentLogHTML(entries, sections);
+function renderAmendmentLog(entries) {
+  document.getElementById("amendment-log-list").innerHTML = renderAmendmentLogHTML(entries);
 }
 
-function handleAmendmentSubmit(event, sections) {
+function handleAmendmentSubmit(event) {
   event.preventDefault();
 
   const targetSelect = document.getElementById("amendment-target");
@@ -136,7 +74,9 @@ function handleAmendmentSubmit(event, sections) {
 
   errorsEl.textContent = "";
 
-  const targetLabel = describeTarget(target, sections);
+  // The dropdown's own visible option text is the target label — no need
+  // to look anything up, the static markup already says what it means.
+  const targetLabel = targetSelect.options[targetSelect.selectedIndex].text;
   const { mailtoHref, body } = buildAmendmentMailto({
     targetLabel,
     ruleText,
@@ -150,12 +90,12 @@ function handleAmendmentSubmit(event, sections) {
   fallbackEl.hidden = false;
 
   amendmentLogEntries.push({
-    target,
+    targetLabel,
     proposedText: ruleText,
     proposedBy: "Jimmy",
     date: new Date().toISOString().slice(0, 10)
   });
-  renderAmendmentLog(amendmentLogEntries, sections);
+  renderAmendmentLog(amendmentLogEntries);
 }
 
 function wireCopyButton() {
@@ -174,13 +114,9 @@ function wireCopyButton() {
 
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", () => {
-    const sections = getSectionsFromDOM();
-    populateAmendmentTargetSelect(sections);
-    renderAmendmentLog(amendmentLogEntries, sections);
+    renderAmendmentLog(amendmentLogEntries);
     wireCopyButton();
-    document
-      .getElementById("amendment-form")
-      .addEventListener("submit", (event) => handleAmendmentSubmit(event, sections));
+    document.getElementById("amendment-form").addEventListener("submit", handleAmendmentSubmit);
   });
 }
 
@@ -190,8 +126,6 @@ if (typeof module !== "undefined" && module.exports) {
     formatAmendmentText,
     buildAmendmentMailto,
     renderAmendmentLogHTML,
-    escapeHTML,
-    describeTarget,
-    buildRuleIndex
+    escapeHTML
   };
 }
