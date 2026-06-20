@@ -92,12 +92,32 @@ body {
   width: 100%;
   font-family: inherit;
   font-size: 1rem;
-  padding: 0.5rem;
+  padding: 0.6rem 0.75rem;
   margin-top: 0.25rem;
   border: 1px solid #c9c1ad;
-  border-radius: 2px;
+  border-radius: 3px;
   background: #fffdf8;
   color: #1a1a1a;
+  transition: border-color 0.15s ease;
+}
+
+#amendment-form select:focus,
+#amendment-form textarea:focus {
+  outline: none;
+  border-color: #1a2f4f;
+  box-shadow: 0 0 0 3px rgba(26, 47, 79, 0.12);
+}
+
+#amendment-form select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%231a2f4f' d='M5.5 7.5l4.5 5 4.5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.25rem;
+  cursor: pointer;
 }
 
 #amendment-form button {
