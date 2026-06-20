@@ -46,6 +46,34 @@ function renderAmendmentLogHTML(entries) {
     .join("\n");
 }
 
+// Reads the existing rule list back out as { id, text } pairs so the
+// dropdown doesn't hand-duplicate rule content — no numbering here, numbers
+// are display-only and stay in CSS (see style.css).
+function getRuleOptionsFromDOM() {
+  const rulesEl = document.getElementById("rules");
+  const options = [];
+  Array.from(rulesEl.children).forEach((li) => {
+    if (li.classList.contains("rule-group")) {
+      li.querySelectorAll(".subrule").forEach((sub) => {
+        options.push({ id: sub.id, text: sub.querySelector(".rule-text").textContent });
+      });
+    } else {
+      options.push({ id: li.id, text: li.querySelector(".rule-text").textContent });
+    }
+  });
+  return options;
+}
+
+function populateAmendmentTargetSelect() {
+  const select = document.getElementById("amendment-target");
+  getRuleOptionsFromDOM().forEach((r) => {
+    const option = document.createElement("option");
+    option.value = r.id;
+    option.textContent = r.text;
+    select.appendChild(option);
+  });
+}
+
 let amendmentLogEntries = [];
 
 function renderAmendmentLog(entries) {
@@ -114,6 +142,7 @@ function wireCopyButton() {
 
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", () => {
+    populateAmendmentTargetSelect();
     renderAmendmentLog(amendmentLogEntries);
     wireCopyButton();
     document.getElementById("amendment-form").addEventListener("submit", handleAmendmentSubmit);
