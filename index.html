@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jimmy's Rules</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header id="cover">
+    <h1 id="cover-title"></h1>
+    <p id="cover-subtitle"></p>
+    <p id="cover-preamble"></p>
+  </header>
+
+  <nav id="toc" aria-label="Table of contents"></nav>
+
+  <main id="chapters"></main>
+
+  <section id="amendment-form-section">
+    <h2>Propose an Amendment</h2>
+    <form id="amendment-form">
+      <label for="amendment-chapter">Chapter</label>
+      <select id="amendment-chapter" name="chapter"></select>
+
+      <label for="amendment-text">Proposed rule</label>
+      <textarea id="amendment-text" name="ruleText" rows="3"></textarea>
+
+      <div id="amendment-errors" role="alert"></div>
+
+      <button type="submit">Submit for Ratification</button>
+    </form>
+
+    <div id="amendment-fallback" hidden>
+      <p>If your mail app didn't open, copy this and send it however you like:</p>
+      <pre id="amendment-fallback-text"></pre>
+      <button id="amendment-copy-btn" type="button">Copy</button>
+      <span id="amendment-copy-status"></span>
+    </div>
+  </section>
+
+  <section id="amendment-log-section">
+    <h3>Amendment Log</h3>
+    <ul id="amendment-log-list"></ul>
+  </section>
+
+  <script src="content.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
