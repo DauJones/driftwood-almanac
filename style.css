@@ -43,6 +43,15 @@ body {
 
 #rules {
   counter-reset: rule;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.subrules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .rule {
