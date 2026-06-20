@@ -63,9 +63,77 @@ function renderContent(content) {
     .join("");
 }
 
+function populateChapterSelect(chapters) {
+  const select = document.getElementById("amendment-chapter");
+  select.innerHTML = chapters
+    .map((c) => `<option value="${c.id}">${c.title}</option>`)
+    .join("");
+}
+
+function renderAmendmentLog(entries) {
+  document.getElementById("amendment-log-list").innerHTML = renderAmendmentLogHTML(entries);
+}
+
+function handleAmendmentSubmit(event, content) {
+  event.preventDefault();
+
+  const chapterSelect = document.getElementById("amendment-chapter");
+  const textArea = document.getElementById("amendment-text");
+  const errorsEl = document.getElementById("amendment-errors");
+  const fallbackEl = document.getElementById("amendment-fallback");
+  const fallbackTextEl = document.getElementById("amendment-fallback-text");
+
+  const chapter = chapterSelect.value;
+  const ruleText = textArea.value;
+
+  const { valid, errors } = validateAmendmentForm({ chapter, ruleText });
+
+  if (!valid) {
+    errorsEl.textContent = errors.join(" ");
+    fallbackEl.hidden = true;
+    return;
+  }
+
+  errorsEl.textContent = "";
+
+  const chapterTitle = content.chapters.find((c) => c.id === chapter).title;
+  const { mailtoHref, body } = buildAmendmentMailto({
+    chapter: chapterTitle,
+    ruleText,
+    proposedBy: "Jimmy",
+    toEmail: content.recipientEmail
+  });
+
+  // Always show both paths together — mailto success can't be reliably
+  // detected in-browser, so the fallback is never gated behind a failure.
+  window.location.href = mailtoHref;
+  fallbackTextEl.textContent = body;
+  fallbackEl.hidden = false;
+}
+
+function wireCopyButton() {
+  const copyBtn = document.getElementById("amendment-copy-btn");
+  const statusEl = document.getElementById("amendment-copy-status");
+  copyBtn.addEventListener("click", async () => {
+    const text = document.getElementById("amendment-fallback-text").textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      statusEl.textContent = "Copied!";
+    } catch (err) {
+      statusEl.textContent = "Couldn't copy automatically — select the text above and copy manually.";
+    }
+  });
+}
+
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", () => {
     renderContent(CONTENT);
+    populateChapterSelect(CONTENT.chapters);
+    renderAmendmentLog(CONTENT.amendmentLog);
+    wireCopyButton();
+    document
+      .getElementById("amendment-form")
+      .addEventListener("submit", (event) => handleAmendmentSubmit(event, CONTENT));
   });
 }
 
