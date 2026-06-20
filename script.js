@@ -68,7 +68,8 @@ function renderContent(content) {
     .map(
       (s, i) => `
       <section class="rule" id="${s.id}">
-        <p>${i + 1}. ${escapeHTML(s.text)}</p>
+        <p class="rule-label">Rule ${i + 1}</p>
+        <p class="rule-text">${escapeHTML(s.text)}</p>
       </section>
     `
     )

@@ -10,7 +10,8 @@ const CONTENT = {
     { id: "rule-5", text: "Write your playing partner's name on the scorecard — you will forget otherwise." },
     { id: "rule-6", text: "Double par? Pick up. Leave the hole. Nobody's counting past that anyway." },
     { id: "rule-7", text: "Any putt is a gimme if you ask nicely. Use sparingly." },
-    { id: "rule-8", text: "If you get upset, remember: you are not good enough to be upset about your golf game." }
+    { id: "rule-8", text: "If you get upset, remember: you are not good enough to be upset about your golf game." },
+    { id: "rule-9", text: "It's always ready golf — hit when you're ready, not when it's technically your turn." }
   ],
   amendmentLog: [
     {

@@ -4,86 +4,83 @@
 
 body {
   margin: 0;
-  background: #f3ead9;
-  background-image: radial-gradient(ellipse at top left, #f7f0e1, #ecdfc5 80%);
-  color: #2b2118;
-  font-family: "Georgia", "Times New Roman", serif;
-  line-height: 1.5;
-  padding: 1.5rem 1rem 4rem;
+  background: #ffffff;
+  color: #1a1a1a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  padding: 2rem 1.25rem 4rem;
   max-width: 700px;
   margin-inline: auto;
 }
 
 #cover {
-  text-align: center;
-  border-bottom: 3px double #6b4f2a;
-  padding-bottom: 1.5rem;
-  margin-bottom: 1.5rem;
+  border-bottom: 3px solid #1a2f4f;
+  padding-bottom: 1.25rem;
+  margin-bottom: 2rem;
 }
 
 #cover-title {
-  font-size: 1.6rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  margin-bottom: 0.25rem;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #1a2f4f;
+  margin: 0 0 0.25rem;
+  letter-spacing: -0.01em;
 }
 
 #cover-subtitle {
   font-style: italic;
-  color: #6b4f2a;
-  margin: 0 0 1rem;
+  color: #6b7280;
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
 }
 
 #cover-preamble {
   font-size: 1.05rem;
+  color: #374151;
 }
 
-#toc {
-  margin-bottom: 2rem;
-  text-align: center;
+.rule {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-#toc a {
-  display: inline-block;
-  margin: 0 0.75rem;
-  color: #6b4f2a;
-  text-decoration: none;
-  border-bottom: 1px solid #6b4f2a;
+.rule:last-child {
+  border-bottom: none;
 }
 
-.chapter {
-  margin-bottom: 2.5rem;
-  padding: 1rem 1.25rem;
-  background: rgba(255, 255, 255, 0.35);
-  border: 1px solid #d8c6a1;
-  border-radius: 2px;
-  position: relative;
+.rule-label {
+  margin: 0 0 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #b8312f;
 }
 
-.chapter h2 {
-  margin-top: 0;
-  border-bottom: 1px solid #d8c6a1;
-  padding-bottom: 0.5rem;
-}
-
-.chapter ol {
-  padding-left: 1.25rem;
-}
-
-.chapter li {
-  margin-bottom: 0.75rem;
+.rule-text {
+  margin: 0;
+  font-size: 1.12rem;
+  color: #111827;
+  font-weight: 500;
 }
 
 #amendment-form-section, #amendment-log-section {
   margin-top: 2.5rem;
   padding-top: 1.5rem;
-  border-top: 2px solid #6b4f2a;
+  border-top: 2px solid #1a2f4f;
+}
+
+#amendment-form-section h2,
+#amendment-log-section h3 {
+  color: #1a2f4f;
+  font-weight: 800;
 }
 
 #amendment-form label {
   display: block;
   margin-top: 0.75rem;
-  font-weight: bold;
+  font-weight: 600;
+  color: #374151;
 }
 
 #amendment-form select,
@@ -93,32 +90,37 @@ body {
   font-size: 1rem;
   padding: 0.5rem;
   margin-top: 0.25rem;
-  border: 1px solid #6b4f2a;
-  background: #fffdf8;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: #fff;
+  color: #1a1a1a;
 }
 
 #amendment-form button {
   margin-top: 1rem;
   font-family: inherit;
   font-size: 1rem;
+  font-weight: 600;
   padding: 0.6rem 1.2rem;
-  background: #6b4f2a;
-  color: #fffdf8;
+  background: #1a2f4f;
+  color: #fff;
   border: none;
-  border-radius: 3px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
 #amendment-errors {
-  color: #a33;
+  color: #b8312f;
   margin-top: 0.5rem;
+  font-weight: 600;
 }
 
 #amendment-fallback {
   margin-top: 1.5rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px dashed #6b4f2a;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
 }
 
 #amendment-fallback pre {
@@ -126,11 +128,19 @@ body {
   font-family: inherit;
 }
 
+#amendment-log-list {
+  padding-left: 1.25rem;
+}
+
+#amendment-log-list li {
+  margin-bottom: 0.6rem;
+}
+
 @media (max-width: 480px) {
   body {
-    padding: 1rem 0.75rem 3rem;
+    padding: 1.5rem 1rem 3rem;
   }
   #cover-title {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
   }
 }
