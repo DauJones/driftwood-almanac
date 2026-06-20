@@ -57,7 +57,7 @@ function renderContent(content) {
 
   const toc = document.getElementById("toc");
   toc.innerHTML = content.chapters
-    .map((c) => `<a href="#chapter-${c.id}">${c.title}</a>`)
+    .map((c) => `<a href="#chapter-${c.id}">${escapeHTML(c.title)}</a>`)
     .join("");
 
   const chaptersEl = document.getElementById("chapters");
@@ -65,9 +65,9 @@ function renderContent(content) {
     .map(
       (c) => `
       <section class="chapter${c.id === "closing" ? " stamp" : ""}" id="chapter-${c.id}">
-        <h2>${c.title}</h2>
+        <h2>${escapeHTML(c.title)}</h2>
         <ol>
-          ${c.rules.map((r) => `<li>${r}</li>`).join("")}
+          ${c.rules.map((r) => `<li>${escapeHTML(r)}</li>`).join("")}
         </ol>
       </section>
     `
