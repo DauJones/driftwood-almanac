@@ -26,15 +26,27 @@ function buildAmendmentMailto({ chapter, ruleText, proposedBy, toEmail }) {
   return { subject, body, mailtoHref };
 }
 
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function renderAmendmentLogHTML(entries) {
   if (!entries || entries.length === 0) {
     return "<li>No amendments yet.</li>";
   }
   return entries
-    .map(
-      (e) =>
-        `<li><strong>${e.chapter}</strong>: ${e.text} <em>(proposed by ${e.proposedBy}, ${e.date})</em></li>`
-    )
+    .map((e) => {
+      const chapter = escapeHTML(e.chapter || "(unknown chapter)");
+      const text = escapeHTML(e.text || "(no rule text)");
+      const proposedBy = escapeHTML(e.proposedBy || "(unknown)");
+      const date = escapeHTML(e.date || "(no date)");
+      return `<li><strong>${chapter}</strong>: ${text} <em>(proposed by ${proposedBy}, ${date})</em></li>`;
+    })
     .join("\n");
 }
 
@@ -143,6 +155,7 @@ if (typeof module !== "undefined" && module.exports) {
     formatAmendmentText,
     buildAmendmentMailto,
     renderAmendmentLogHTML,
-    renderContent
+    renderContent,
+    escapeHTML
   };
 }

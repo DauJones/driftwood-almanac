@@ -3,7 +3,8 @@ const {
   validateAmendmentForm,
   formatAmendmentText,
   buildAmendmentMailto,
-  renderAmendmentLogHTML
+  renderAmendmentLogHTML,
+  escapeHTML
 } = require("./script.js");
 
 // validateAmendmentForm
@@ -56,6 +57,32 @@ const {
 {
   const html = renderAmendmentLogHTML([]);
   assert.ok(html.includes("No amendments"));
+}
+
+// escapeHTML
+{
+  const { escapeHTML } = require("./script.js");
+  assert.strictEqual(escapeHTML("Rules & Regulations"), "Rules &amp; Regulations");
+  assert.strictEqual(escapeHTML("<3 strokes"), "&lt;3 strokes");
+  assert.strictEqual(escapeHTML('He said "go"'), "He said &quot;go&quot;");
+}
+
+// renderAmendmentLogHTML escapes special characters
+{
+  const html = renderAmendmentLogHTML([
+    { chapter: "golf", text: "No <gimmes> & no exceptions", proposedBy: "Bear", date: "2026-06-19" }
+  ]);
+  assert.ok(html.includes("&lt;gimmes&gt;"));
+  assert.ok(html.includes("&amp; no exceptions"));
+  assert.ok(!html.includes("<gimmes>"));
+}
+
+// renderAmendmentLogHTML guards a malformed entry instead of rendering "undefined"
+{
+  const html = renderAmendmentLogHTML([
+    { chapter: "golf", text: "Missing some fields" }
+  ]);
+  assert.ok(!html.includes("undefined"));
 }
 
 console.log("All tests passed.");
