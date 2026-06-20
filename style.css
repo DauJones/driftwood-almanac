@@ -74,21 +74,6 @@ body {
   margin-bottom: 0.75rem;
 }
 
-.chapter.stamp::after {
-  content: "RATIFIED";
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  color: #a33;
-  border: 2px solid #a33;
-  border-radius: 50%;
-  padding: 0.4rem 0.5rem;
-  transform: rotate(-12deg);
-  opacity: 0.6;
-}
-
 #amendment-form-section, #amendment-log-section {
   margin-top: 2.5rem;
   padding-top: 1.5rem;

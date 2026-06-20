@@ -1,7 +1,7 @@
-function validateAmendmentForm({ chapter, ruleText }) {
+function validateAmendmentForm({ target, ruleText }) {
   const errors = [];
-  if (!chapter || typeof chapter !== "string" || chapter.trim() === "") {
-    errors.push("Please select a chapter.");
+  if (!target || typeof target !== "string" || target.trim() === "") {
+    errors.push("Please choose a rule to amend, or propose a new one.");
   }
   if (!ruleText || typeof ruleText !== "string" || ruleText.trim() === "") {
     errors.push("Please enter your proposed rule.");
@@ -9,19 +9,19 @@ function validateAmendmentForm({ chapter, ruleText }) {
   return { valid: errors.length === 0, errors };
 }
 
-function formatAmendmentText({ chapter, ruleText, proposedBy }) {
+function formatAmendmentText({ targetLabel, ruleText, proposedBy }) {
   return [
     "Proposed Amendment",
     "",
-    `Chapter: ${chapter}`,
+    `Target: ${targetLabel}`,
     `Rule: ${ruleText}`,
     `Proposed by: ${proposedBy}`
   ].join("\n");
 }
 
-function buildAmendmentMailto({ chapter, ruleText, proposedBy, toEmail }) {
-  const subject = `Proposed Amendment: ${chapter}`;
-  const body = formatAmendmentText({ chapter, ruleText, proposedBy });
+function buildAmendmentMailto({ targetLabel, ruleText, proposedBy, toEmail }) {
+  const subject = `Proposed Amendment: ${targetLabel}`;
+  const body = formatAmendmentText({ targetLabel, ruleText, proposedBy });
   const mailtoHref = `mailto:${toEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   return { subject, body, mailtoHref };
 }
@@ -35,17 +35,25 @@ function escapeHTML(str) {
     .replace(/'/g, "&#39;");
 }
 
-function renderAmendmentLogHTML(entries) {
+function describeTarget(target, sections) {
+  if (!target || target === "new") {
+    return "New Rule";
+  }
+  const match = sections.find((s) => s.id === target);
+  return match ? `Amendment to "${match.text}"` : "Unknown Rule";
+}
+
+function renderAmendmentLogHTML(entries, sections) {
   if (!entries || entries.length === 0) {
     return "<li>No amendments yet.</li>";
   }
   return entries
     .map((e) => {
-      const chapter = escapeHTML(e.chapter || "(unknown chapter)");
-      const text = escapeHTML(e.text || "(no rule text)");
+      const targetLabel = escapeHTML(describeTarget(e.target, sections));
+      const text = escapeHTML(e.proposedText || "(no rule text)");
       const proposedBy = escapeHTML(e.proposedBy || "(unknown)");
       const date = escapeHTML(e.date || "(no date)");
-      return `<li><strong>${chapter}</strong>: ${text} <em>(proposed by ${proposedBy}, ${date})</em></li>`;
+      return `<li><strong>${targetLabel}</strong>: ${text} <em>(proposed by ${proposedBy}, ${date})</em></li>`;
     })
     .join("\n");
 }
@@ -55,55 +63,43 @@ function renderContent(content) {
   document.getElementById("cover-subtitle").textContent = content.subtitle;
   document.getElementById("cover-preamble").textContent = content.preamble;
 
-  const toc = document.getElementById("toc");
-  toc.innerHTML = content.chapters
-    .map((c) => `<a href="#chapter-${c.id}">${escapeHTML(c.title)}</a>`)
-    .join("");
-
-  const chaptersEl = document.getElementById("chapters");
-  chaptersEl.innerHTML = content.chapters
+  const rulesEl = document.getElementById("rules");
+  rulesEl.innerHTML = content.sections
     .map(
-      (c) => `
-      <section class="chapter${c.id === "closing" ? " stamp" : ""}" id="chapter-${c.id}">
-        <h2>${escapeHTML(c.title)}</h2>
-        <ol>
-          ${c.rules.map((r) => `<li>${escapeHTML(r)}</li>`).join("")}
-        </ol>
+      (s, i) => `
+      <section class="rule" id="${s.id}">
+        <p>${i + 1}. ${escapeHTML(s.text)}</p>
       </section>
     `
     )
     .join("");
 }
 
-function populateChapterSelect(chapters) {
-  const select = document.getElementById("amendment-chapter");
-  select.innerHTML = chapters
-    .map((c) => `<option value="${c.id}">${c.title}</option>`)
+function populateAmendmentTargetSelect(sections) {
+  const select = document.getElementById("amendment-target");
+  const ruleOptions = sections
+    .map((s, i) => `<option value="${s.id}">Rule ${i + 1}</option>`)
     .join("");
+  select.innerHTML = `<option value="new">A new rule</option>${ruleOptions}`;
 }
 
-function renderAmendmentLog(entries) {
-  document.getElementById("amendment-log-list").innerHTML = renderAmendmentLogHTML(entries);
-}
-
-function findChapterTitle(chapters, chapterId) {
-  const match = chapters.find((c) => c.id === chapterId);
-  return match ? match.title : null;
+function renderAmendmentLog(entries, sections) {
+  document.getElementById("amendment-log-list").innerHTML = renderAmendmentLogHTML(entries, sections);
 }
 
 function handleAmendmentSubmit(event, content) {
   event.preventDefault();
 
-  const chapterSelect = document.getElementById("amendment-chapter");
+  const targetSelect = document.getElementById("amendment-target");
   const textArea = document.getElementById("amendment-text");
   const errorsEl = document.getElementById("amendment-errors");
   const fallbackEl = document.getElementById("amendment-fallback");
   const fallbackTextEl = document.getElementById("amendment-fallback-text");
 
-  const chapter = chapterSelect.value;
+  const target = targetSelect.value;
   const ruleText = textArea.value;
 
-  const { valid, errors } = validateAmendmentForm({ chapter, ruleText });
+  const { valid, errors } = validateAmendmentForm({ target, ruleText });
 
   if (!valid) {
     errorsEl.textContent = errors.join(" ");
@@ -113,15 +109,9 @@ function handleAmendmentSubmit(event, content) {
 
   errorsEl.textContent = "";
 
-  const chapterTitle = findChapterTitle(content.chapters, chapter);
-  if (!chapterTitle) {
-    errorsEl.textContent = "Please select a valid chapter.";
-    fallbackEl.hidden = true;
-    return;
-  }
-
+  const targetLabel = describeTarget(target, content.sections);
   const { mailtoHref, body } = buildAmendmentMailto({
-    chapter: chapterTitle,
+    targetLabel,
     ruleText,
     proposedBy: "Jimmy",
     toEmail: content.recipientEmail
@@ -151,8 +141,8 @@ function wireCopyButton() {
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", () => {
     renderContent(CONTENT);
-    populateChapterSelect(CONTENT.chapters);
-    renderAmendmentLog(CONTENT.amendmentLog);
+    populateAmendmentTargetSelect(CONTENT.sections);
+    renderAmendmentLog(CONTENT.amendmentLog, CONTENT.sections);
     wireCopyButton();
     document
       .getElementById("amendment-form")
@@ -168,6 +158,6 @@ if (typeof module !== "undefined" && module.exports) {
     renderAmendmentLogHTML,
     renderContent,
     escapeHTML,
-    findChapterTitle
+    describeTarget
   };
 }

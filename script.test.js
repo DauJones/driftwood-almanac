@@ -5,30 +5,35 @@ const {
   buildAmendmentMailto,
   renderAmendmentLogHTML,
   escapeHTML,
-  findChapterTitle
+  describeTarget
 } = require("./script.js");
+
+const sections = [
+  { id: "rule-1", text: "Breakfast ball on the first tee." },
+  { id: "rule-2", text: "Foot wedges are legal." }
+];
 
 // validateAmendmentForm
 {
-  const result = validateAmendmentForm({ chapter: "golf", ruleText: "No gimmes over 3 feet." });
+  const result = validateAmendmentForm({ target: "rule-1", ruleText: "No gimmes over 3 feet." });
   assert.strictEqual(result.valid, true);
   assert.deepStrictEqual(result.errors, []);
 }
 {
-  const result = validateAmendmentForm({ chapter: "", ruleText: "" });
+  const result = validateAmendmentForm({ target: "", ruleText: "" });
   assert.strictEqual(result.valid, false);
   assert.strictEqual(result.errors.length, 2);
 }
 {
-  const result = validateAmendmentForm({ chapter: "golf", ruleText: "   " });
+  const result = validateAmendmentForm({ target: "rule-1", ruleText: "   " });
   assert.strictEqual(result.valid, false);
   assert.strictEqual(result.errors.length, 1);
 }
 
 // formatAmendmentText
 {
-  const text = formatAmendmentText({ chapter: "golf", ruleText: "No gimmes.", proposedBy: "Jimmy" });
-  assert.ok(text.includes("Chapter: golf"));
+  const text = formatAmendmentText({ targetLabel: "Rule 1", ruleText: "No gimmes.", proposedBy: "Jimmy" });
+  assert.ok(text.includes("Target: Rule 1"));
   assert.ok(text.includes("Rule: No gimmes."));
   assert.ok(text.includes("Proposed by: Jimmy"));
 }
@@ -36,65 +41,57 @@ const {
 // buildAmendmentMailto
 {
   const { subject, body, mailtoHref } = buildAmendmentMailto({
-    chapter: "golf",
+    targetLabel: "Rule 1",
     ruleText: "No gimmes.",
     proposedBy: "Jimmy",
     toEmail: "donovansarahn@gmail.com"
   });
-  assert.strictEqual(subject, "Proposed Amendment: golf");
+  assert.strictEqual(subject, "Proposed Amendment: Rule 1");
   assert.ok(body.includes("No gimmes."));
   assert.ok(mailtoHref.startsWith("mailto:donovansarahn@gmail.com?"));
   assert.ok(mailtoHref.includes(encodeURIComponent(subject)));
 }
 
-// renderAmendmentLogHTML
-{
-  const html = renderAmendmentLogHTML([
-    { chapter: "golf", text: "Test rule", proposedBy: "Bear", date: "2026-06-19" }
-  ]);
-  assert.ok(html.includes("Test rule"));
-  assert.ok(html.includes("Bear"));
-}
-{
-  const html = renderAmendmentLogHTML([]);
-  assert.ok(html.includes("No amendments"));
-}
-
 // escapeHTML
 {
-  const { escapeHTML } = require("./script.js");
   assert.strictEqual(escapeHTML("Rules & Regulations"), "Rules &amp; Regulations");
   assert.strictEqual(escapeHTML("<3 strokes"), "&lt;3 strokes");
   assert.strictEqual(escapeHTML('He said "go"'), "He said &quot;go&quot;");
 }
 
-// renderAmendmentLogHTML escapes special characters
+// describeTarget
 {
-  const html = renderAmendmentLogHTML([
-    { chapter: "golf", text: "No <gimmes> & no exceptions", proposedBy: "Bear", date: "2026-06-19" }
-  ]);
+  assert.strictEqual(describeTarget("new", sections), "New Rule");
+  assert.strictEqual(describeTarget("rule-1", sections), 'Amendment to "Breakfast ball on the first tee."');
+  assert.strictEqual(describeTarget("nonexistent", sections), "Unknown Rule");
+}
+
+// renderAmendmentLogHTML
+{
+  const html = renderAmendmentLogHTML(
+    [{ target: "new", proposedText: "Test rule", proposedBy: "Bear", date: "2026-06-19" }],
+    sections
+  );
+  assert.ok(html.includes("Test rule"));
+  assert.ok(html.includes("Bear"));
+  assert.ok(html.includes("New Rule"));
+}
+{
+  const html = renderAmendmentLogHTML([], sections);
+  assert.ok(html.includes("No amendments"));
+}
+{
+  const html = renderAmendmentLogHTML(
+    [{ target: "rule-1", proposedText: "No <gimmes> & no exceptions", proposedBy: "Bear", date: "2026-06-19" }],
+    sections
+  );
   assert.ok(html.includes("&lt;gimmes&gt;"));
   assert.ok(html.includes("&amp; no exceptions"));
   assert.ok(!html.includes("<gimmes>"));
 }
-
-// renderAmendmentLogHTML guards a malformed entry instead of rendering "undefined"
 {
-  const html = renderAmendmentLogHTML([
-    { chapter: "golf", text: "Missing some fields" }
-  ]);
+  const html = renderAmendmentLogHTML([{ target: "rule-1" }], sections);
   assert.ok(!html.includes("undefined"));
-}
-
-// findChapterTitle
-{
-  const { findChapterTitle } = require("./script.js");
-  const chapters = [
-    { id: "golf", title: "Golf", rules: [] },
-    { id: "business-life", title: "Business & Life", rules: [] }
-  ];
-  assert.strictEqual(findChapterTitle(chapters, "golf"), "Golf");
-  assert.strictEqual(findChapterTitle(chapters, "nonexistent-id"), null);
 }
 
 console.log("All tests passed.");
