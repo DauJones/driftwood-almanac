@@ -78,7 +78,7 @@ const sections = [
 }
 {
   const html = renderAmendmentLogHTML([], sections);
-  assert.ok(html.includes("No amendments"));
+  assert.ok(html.includes("reviewed by committee"));
 }
 {
   const html = renderAmendmentLogHTML(

@@ -45,7 +45,7 @@ function describeTarget(target, sections) {
 
 function renderAmendmentLogHTML(entries, sections) {
   if (!entries || entries.length === 0) {
-    return "<li>No amendments yet.</li>";
+    return "<li>Amendment requests shown here and reviewed by committee.</li>";
   }
   return entries
     .map((e) => {
@@ -68,7 +68,7 @@ function renderContent(content) {
     .map(
       (s, i) => `
       <section class="rule" id="${s.id}">
-        <p class="rule-label">Rule ${i + 1}</p>
+        <span class="rule-number">${i + 1}</span>
         <p class="rule-text">${escapeHTML(s.text)}</p>
       </section>
     `
@@ -83,6 +83,8 @@ function populateAmendmentTargetSelect(sections) {
     .join("");
   select.innerHTML = `<option value="new">A new rule</option>${ruleOptions}`;
 }
+
+let amendmentLogEntries = [];
 
 function renderAmendmentLog(entries, sections) {
   document.getElementById("amendment-log-list").innerHTML = renderAmendmentLogHTML(entries, sections);
@@ -123,6 +125,14 @@ function handleAmendmentSubmit(event, content) {
   window.location.href = mailtoHref;
   fallbackTextEl.textContent = body;
   fallbackEl.hidden = false;
+
+  amendmentLogEntries.push({
+    target,
+    proposedText: ruleText,
+    proposedBy: "Jimmy",
+    date: new Date().toISOString().slice(0, 10)
+  });
+  renderAmendmentLog(amendmentLogEntries, content.sections);
 }
 
 function wireCopyButton() {
@@ -143,7 +153,8 @@ if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", () => {
     renderContent(CONTENT);
     populateAmendmentTargetSelect(CONTENT.sections);
-    renderAmendmentLog(CONTENT.amendmentLog, CONTENT.sections);
+    amendmentLogEntries = [...CONTENT.amendmentLog];
+    renderAmendmentLog(amendmentLogEntries, CONTENT.sections);
     wireCopyButton();
     document
       .getElementById("amendment-form")

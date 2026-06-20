@@ -13,14 +13,7 @@ const CONTENT = {
     { id: "rule-8", text: "If you get upset, remember: you are not good enough to be upset about your golf game." },
     { id: "rule-9", text: "It's always ready golf — hit when you're ready, not when it's technically your turn." }
   ],
-  amendmentLog: [
-    {
-      target: "new",
-      proposedText: "Mulligans are unlimited but must be announced loudly enough for the group ahead to hear.",
-      proposedBy: "Bear",
-      date: "2026-06-19"
-    }
-  ],
+  amendmentLog: [],
   recipientEmail: "donovansarahn@gmail.com"
 };
 
