@@ -1,0 +1,151 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f3ead9;
+  background-image: radial-gradient(ellipse at top left, #f7f0e1, #ecdfc5 80%);
+  color: #2b2118;
+  font-family: "Georgia", "Times New Roman", serif;
+  line-height: 1.5;
+  padding: 1.5rem 1rem 4rem;
+  max-width: 700px;
+  margin-inline: auto;
+}
+
+#cover {
+  text-align: center;
+  border-bottom: 3px double #6b4f2a;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+#cover-title {
+  font-size: 1.6rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+#cover-subtitle {
+  font-style: italic;
+  color: #6b4f2a;
+  margin: 0 0 1rem;
+}
+
+#cover-preamble {
+  font-size: 1.05rem;
+}
+
+#toc {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+#toc a {
+  display: inline-block;
+  margin: 0 0.75rem;
+  color: #6b4f2a;
+  text-decoration: none;
+  border-bottom: 1px solid #6b4f2a;
+}
+
+.chapter {
+  margin-bottom: 2.5rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid #d8c6a1;
+  border-radius: 2px;
+  position: relative;
+}
+
+.chapter h2 {
+  margin-top: 0;
+  border-bottom: 1px solid #d8c6a1;
+  padding-bottom: 0.5rem;
+}
+
+.chapter ol {
+  padding-left: 1.25rem;
+}
+
+.chapter li {
+  margin-bottom: 0.75rem;
+}
+
+.chapter.stamp::after {
+  content: "RATIFIED";
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: #a33;
+  border: 2px solid #a33;
+  border-radius: 50%;
+  padding: 0.4rem 0.5rem;
+  transform: rotate(-12deg);
+  opacity: 0.6;
+}
+
+#amendment-form-section, #amendment-log-section {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #6b4f2a;
+}
+
+#amendment-form label {
+  display: block;
+  margin-top: 0.75rem;
+  font-weight: bold;
+}
+
+#amendment-form select,
+#amendment-form textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid #6b4f2a;
+  background: #fffdf8;
+}
+
+#amendment-form button {
+  margin-top: 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.6rem 1.2rem;
+  background: #6b4f2a;
+  color: #fffdf8;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+#amendment-errors {
+  color: #a33;
+  margin-top: 0.5rem;
+}
+
+#amendment-fallback {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px dashed #6b4f2a;
+}
+
+#amendment-fallback pre {
+  white-space: pre-wrap;
+  font-family: inherit;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 1rem 0.75rem 3rem;
+  }
+  #cover-title {
+    font-size: 1.3rem;
+  }
+}
