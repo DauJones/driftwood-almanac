@@ -18,7 +18,7 @@
       <li class="rule rule-group" id="forgiveness">
         <div class="rule-group-header">
           <span class="rule-number"></span>
-          <p class="rule-text rule-group-title">Forgiveness</p>
+          <h2 class="rule-text rule-group-title">Forgiveness</h2>
         </div>
         <ul class="subrules">
           <li class="subrule" id="forgiveness-1">
@@ -60,36 +60,36 @@
         <p class="rule-text">Have fun.</p>
       </li>
     </ul>
+
+    <section id="amendment-form-section">
+      <h2>Propose an Amendment</h2>
+      <form id="amendment-form">
+        <label for="amendment-target">Which rule?</label>
+        <select id="amendment-target" name="target">
+          <option value="new">A new rule</option>
+        </select>
+
+        <label for="amendment-text">Proposed rule</label>
+        <textarea id="amendment-text" name="ruleText" rows="3"></textarea>
+
+        <div id="amendment-errors" role="alert"></div>
+
+        <button type="submit">Submit for Ratification</button>
+      </form>
+
+      <div id="amendment-fallback" hidden>
+        <p>If your mail app didn't open, copy this and send it however you like:</p>
+        <pre id="amendment-fallback-text"></pre>
+        <button id="amendment-copy-btn" type="button">Copy</button>
+        <span id="amendment-copy-status"></span>
+      </div>
+    </section>
+
+    <section id="amendment-log-section">
+      <h3>Amendment Log</h3>
+      <ul id="amendment-log-list"></ul>
+    </section>
   </main>
-
-  <section id="amendment-form-section">
-    <h2>Propose an Amendment</h2>
-    <form id="amendment-form">
-      <label for="amendment-target">Which rule?</label>
-      <select id="amendment-target" name="target">
-        <option value="new">A new rule</option>
-      </select>
-
-      <label for="amendment-text">Proposed rule</label>
-      <textarea id="amendment-text" name="ruleText" rows="3"></textarea>
-
-      <div id="amendment-errors" role="alert"></div>
-
-      <button type="submit">Submit for Ratification</button>
-    </form>
-
-    <div id="amendment-fallback" hidden>
-      <p>If your mail app didn't open, copy this and send it however you like:</p>
-      <pre id="amendment-fallback-text"></pre>
-      <button id="amendment-copy-btn" type="button">Copy</button>
-      <span id="amendment-copy-status"></span>
-    </div>
-  </section>
-
-  <section id="amendment-log-section">
-    <h3>Amendment Log</h3>
-    <ul id="amendment-log-list"></ul>
-  </section>
 
   <script src="script.js?v=202606200129"></script>
 </body>
